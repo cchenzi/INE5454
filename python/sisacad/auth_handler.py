@@ -11,7 +11,7 @@ from selenium import webdriver
 from config import settings
 
 
-def fetch_cookie(service: str) -> Dict[str, str]:
+def fetch_cookies(service: str) -> Dict[str, str]:
     """Execute a Selenium webdriver to get the authentication cookie
 
     User and password are set in config file
@@ -20,7 +20,7 @@ def fetch_cookie(service: str) -> Dict[str, str]:
         service (str): url of the desired service
 
     Returns:
-        Dict[str, str]: Auth headers to use in requests to system
+        Dict[str, str]: Auth cookie header
     """
     options = webdriver.ChromeOptions()
     options.headless = True
@@ -36,7 +36,7 @@ def fetch_cookie(service: str) -> Dict[str, str]:
     submit_button = driver.find_element(by='name', value="submit")
     submit_button.click()
 
-    return {
-        cookie['name']: cookie['value']
+    return {"Cookie": ";".join([
+        cookie['name'] + "=" + cookie['value']
         for cookie in driver.get_cookies()
-    }
+    ])}
