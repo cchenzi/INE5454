@@ -7,6 +7,7 @@ authors = ["Francisco Vicenzi"]
 [tool.poetry.dependencies]
 python = "^3.10"
 pandas = "^1.4.0"
+streamlit = "^1.5.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
