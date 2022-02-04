@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 
 
@@ -33,13 +34,15 @@ def prepare_cagr_data(data_path):
             "out_slots",
             "schedules",
             "id",
+            "professors",
         ]
     ]
 
 
 def get_optatufsc_data():
-    sisacad_data_path = "../../data/sisacad.json"
-    cagr_data_path = "../../data/cagr_total.json"
+    curr_dir = os.path.dirname(__file__)
+    sisacad_data_path = os.path.join(curr_dir, "../../../data/sisacad.json")
+    cagr_data_path = os.path.join(curr_dir, "../../../data/cagr_total.json")
 
     sisacad = prepare_sisacad_data(sisacad_data_path)
 
@@ -50,7 +53,9 @@ def get_optatufsc_data():
     )
     optatufsc = optatufsc[optatufsc["course_code"] == 208]
 
-    optatufsc.to_csv("../../data/optatufsc_cco.csv", index=False)
+    optatufsc.to_csv(
+        os.path.join(curr_dir, "../../../data/optatufsc_cco2.csv"), index=False
+    )
 
 
 if __name__ == "__main__":

@@ -6,8 +6,8 @@ import requests
 from loguru import logger
 from bs4 import BeautifulSoup
 
-from config import settings
-from auth_handler import fetch_cookies
+from .config import settings
+from .auth_handler import fetch_cookies
 
 
 def scrap_optatives() -> List[Dict]:
@@ -55,6 +55,10 @@ def scrap_optatives_for_course(course_code: str, version: str,
                             'versao_id': version})
 
     table = page.find('table')
+
+    if table is None:
+        logger.warning('Failed to found table inside course page')
+        return []
 
     optatives: List[Tuple[str, str]] = []
     found_header = False

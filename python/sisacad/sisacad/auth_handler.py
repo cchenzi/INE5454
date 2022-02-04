@@ -8,7 +8,7 @@ from urllib.parse import quote as url_encode
 
 from selenium import webdriver
 
-from config import settings
+from .config import settings
 
 
 def fetch_cookies(service: str) -> Dict[str, str]:
