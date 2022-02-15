@@ -1,7 +1,7 @@
 use select::{node::Node, predicate::Name};
 use serde::{Deserialize, Serialize};
 
-use crate::scrapper::Cagr;
+use crate::scrapper::{Cagr, Campus};
 
 #[derive(Serialize, Deserialize)]
 pub struct Subject {
@@ -47,17 +47,26 @@ impl Subject {
 #[derive(Serialize, Deserialize)]
 pub struct Semester {
     pub semester: String,
+    pub campus: Campus,
     pub subjects: Vec<Subject>,
 }
 
 impl Semester {
-    pub async fn get_subjects_from_semester(cagr: &Cagr<'_>, semester: String) -> Semester {
-        let pages = &cagr.get_number_of_pages(semester.clone()).await;
-        println!("Doing for {}. #pages={}", semester, pages);
+    pub async fn get_subjects_from_semester(
+        cagr: &Cagr<'_>,
+        semester: String,
+        campus: &Campus,
+    ) -> Semester {
+        let pages = &cagr.get_number_of_pages(semester.clone(), campus).await;
+        println!("Doing for {:?}/{}. #pages={}", campus, semester, pages);
         let subjects: Vec<Subject> = cagr
-            .get_n_subject_pages_from_semester(&semester, pages.to_owned())
+            .get_n_subject_pages_from_semester(&semester, pages.to_owned(), campus)
             .await;
 
-        Semester { semester, subjects }
+        Semester {
+            semester,
+            campus: *campus,
+            subjects,
+        }
     }
 }
