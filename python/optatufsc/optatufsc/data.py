@@ -19,12 +19,13 @@ def prepare_sisacad_data(data_path):
 def prepare_cagr_data(data_path):
     cagr = pd.read_json(data_path)
 
-    exploded = cagr.explode("subjects", ignore_index=True)
+    exploded = cagr.explode("subjects", ignore_index=True).dropna(subset=["subjects"])
     cagr = exploded.join(pd.DataFrame(exploded["subjects"].tolist()))
 
     return cagr[
         [
             "semester",
+            "campus",
             "class",
             "total_hours",
             "open_slots",
@@ -38,7 +39,7 @@ def prepare_cagr_data(data_path):
 
 def get_optatufsc_data():
     sisacad_data_path = "../../data/sisacad.json"
-    cagr_data_path = "../../data/cagr.json"
+    cagr_data_path = "../../data/cagr_total.json"
 
     sisacad = prepare_sisacad_data(sisacad_data_path)
 
