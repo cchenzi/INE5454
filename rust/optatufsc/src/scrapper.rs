@@ -2,7 +2,7 @@ use select::{
     document::Document,
     predicate::{Attr, Name, Predicate},
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::subject::{Semester, Subject};
 
@@ -21,6 +21,26 @@ pub struct RequestForm {
     #[serde(rename = "formBusca:dataScroller1")]
     pub page: String,
 }
+
+#[derive(Deserialize, Serialize, Clone, Copy, Debug)]
+pub enum Campus {
+    FLO = 1,
+    JOI = 2,
+    CBS = 3,
+    ARA = 4,
+    BLN = 5,
+}
+
+impl Campus {
+    pub const VALUES: [Campus; 5] = [
+        Campus::FLO,
+        Campus::JOI,
+        Campus::CBS,
+        Campus::ARA,
+        Campus::BLN,
+    ];
+}
+
 pub struct Cagr<'a> {
     pub client: awc::Client,
     pub session_cookie: actix_web::cookie::Cookie<'a>,
@@ -74,15 +94,16 @@ impl<'a> Cagr<'a> {
         &self,
         semester: &str,
         pages: u32,
+        campus: &Campus,
     ) -> Vec<Subject> {
         let mut subjects: Vec<Subject> = Vec::new();
-
+        let campus_str = (*campus as u32).to_string();
         for page in 1..(pages + 1) {
             let req = RequestForm {
                 form_busca: "formBusca".to_string(),
                 view_state: "j_id1".to_owned(),
                 semester: semester.to_string(),
-                campus: "1".to_string(),
+                campus: campus_str.clone(),
                 page: page.to_string(),
             };
             let body_as_str = self.perform_request(&req).await;
@@ -91,12 +112,12 @@ impl<'a> Cagr<'a> {
         subjects
     }
 
-    pub async fn get_number_of_pages(&self, semester: String) -> u32 {
+    pub async fn get_number_of_pages(&self, semester: String, campus: &Campus) -> u32 {
         let req = RequestForm {
             form_busca: "formBusca".to_string(),
             view_state: "j_id1".to_owned(),
             semester: semester.to_string(),
-            campus: "1".to_string(),
+            campus: (*campus as u32).to_string(),
             page: "2".to_string(),
         };
         let body_as_str = self.perform_request(&req).await;
@@ -145,17 +166,20 @@ pub fn semesters(html_as_str: &str) -> Vec<String> {
 
 pub fn number_of_pages(html_as_str: &str) -> u32 {
     let document = Document::from(html_as_str);
-    let total_entries_string = document
+    let total_entries_string = match document
         .find(Name("span").and(Attr("id", "formBusca:dataTableGroup")))
         .next()
         .expect("Unable to get dataTable span!")
         .find(Name("span"))
         .next()
-        .expect("Unable to get number of class entries")
-        .text();
-    let total_entries = total_entries_string
-        .parse::<u32>()
-        .expect("Unable to convert total_entries string to integer!");
+    {
+        Some(n) => n.text(),
+        None => "0".to_string(),
+    };
+    let total_entries = match total_entries_string.parse::<u32>() {
+        Ok(v) => v,
+        Err(_) => 0,
+    };
     let pages = total_entries as f32 / 50_f32;
     pages.ceil() as u32
 }
@@ -163,11 +187,12 @@ pub fn number_of_pages(html_as_str: &str) -> u32 {
 pub async fn get_subjects_from_semesters(
     cagr: &mut Cagr<'_>,
     semesters: Vec<String>,
+    campus: &Campus,
 ) -> Vec<Semester> {
     let mut content: Vec<Semester> = Vec::new();
     for semester in semesters {
         cagr.refresh_cookie().await;
-        let s = Semester::get_subjects_from_semester(cagr, semester).await;
+        let s = Semester::get_subjects_from_semester(cagr, semester, campus).await;
         content.push(s);
     }
     content
