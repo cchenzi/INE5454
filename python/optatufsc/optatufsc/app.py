@@ -6,9 +6,10 @@ import pandas as pd
 from views import optatives_vw, historic_vw
 from views.utils import fix_professors_columns
 
-DATA_SOURCE = os.path.join(
-    os.path.dirname(__file__), "../../../data/optatufsc2.csv"
-)
+DATA_SOURCE = os.path.join(os.path.dirname(__file__), "../../../data/optatufsc.csv")
+
+logo = '<img src="https://i.imgur.com/qP38IBM.png" alt="Universidade Federal de Santa Catarina" style="border:0px;margin-left:20px;margin-top:7px;float:right;  width:90px;"></img>'
+logo_html = '<div style="text-align: right;">' + logo + "</div>"
 
 
 def main():
@@ -29,6 +30,11 @@ def main():
 
 def setup_page():
     st.set_page_config(layout="wide")
+    st.markdown(
+        logo_html,
+        unsafe_allow_html=True,
+    )
+    st.title("optatUFSC")
 
 
 if __name__ == "__main__":
