@@ -8,7 +8,7 @@ import streamlit as st
 import pandas as pd
 
 
-def optatives_vw(data: pd.DataFrame):
+def optatives_view(data: pd.DataFrame):
     left, right = st.columns(2)
 
     campi = _get_available_campi(data)

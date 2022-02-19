@@ -8,7 +8,7 @@ import pandas as pd
 import streamlit as st
 
 
-def historic_vw(data_source: pd.DataFrame):
+def historic_view(data_source: pd.DataFrame):
     courses = _get_available_courses(data_source)
     selected_course = st.selectbox("Curso", courses)
 

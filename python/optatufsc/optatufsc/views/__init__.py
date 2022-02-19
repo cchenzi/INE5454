@@ -1,2 +1,3 @@
-from ._optatives_vw import optatives_vw  # noqa
-from ._historic_vw import historic_vw  # noqa
+from ._optatives import optatives_view  # noqa
+from ._historic import historic_view  # noqa
+from ._stats import stats_view # noqa
